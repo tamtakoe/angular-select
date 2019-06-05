@@ -3,6 +3,55 @@ Angular wrapper for base-select
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 7.3.8.
 
+## Install
+```sh
+npm install oi-angular-select
+```
+
+## Using
+```js
+...
+import { FormsModule } from '@angular/forms';
+import { AngularSelectModule } from 'oi-angular-select';
+
+@NgModule({
+  ...
+  imports: [
+    ..., AngularSelectModule
+  ],
+...
+```
+
+Example
+```html
+<oi-angular-select [(ngModel)]="value"
+             [models]="items"
+             multiple
+             size="sm"
+             titlePlaceholder="Select..."
+             trackField="value"
+             searchField="name"></oi-angular-select>
+```
+
+```js
+export class AppComponent {
+  items = [
+    { name: 'one', value: 1 },
+    { name: 'two', value: 2 },
+    { name: 'three', value: 3 },
+    { name: 'four', value: 4 },
+    { name: 'five', value: 5 },
+    { name: 'six', value: 6 },
+    { name: 'seven', value: 7 },
+    { name: 'eight', value: 8 },
+    { name: 'nine', value: 9 },
+    { name: 'ten', value: 10 }
+  ];
+
+  value = [];
+}
+```
+
 ## Development server
 
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
