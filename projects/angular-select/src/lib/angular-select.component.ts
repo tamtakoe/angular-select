@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 
 @Component({
-  selector: 'lib-angular-select',
+  selector: 'oi-angular-select',
   template: `
     <p>
-      angular-select works!
+      oi-angular-select works!
     </p>
   `,
   styles: []

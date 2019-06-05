@@ -10,7 +10,7 @@ describe('workspace-project App', () => {
 
   it('should display welcome message', () => {
     page.navigateTo();
-    expect(page.getTitleText()).toEqual('Welcome to angular-select!');
+    expect(page.getTitleText()).toEqual('Welcome to oi-angular-select!');
   });
 
   afterEach(async () => {

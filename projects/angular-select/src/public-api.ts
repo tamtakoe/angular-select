@@ -1,5 +1,5 @@
 /*
- * Public API Surface of angular-select
+ * Public API Surface of oi-angular-select
  */
 
 export * from './lib/angular-select.service';
