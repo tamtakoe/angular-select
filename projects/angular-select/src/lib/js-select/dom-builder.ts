@@ -447,12 +447,12 @@ export abstract class SelectDom {
 
   // Element constructors
   updateLabel(element, labelGetter, item, query?, extraLabelElement?){
-    const label = labelGetter(item, query, this);
+    const label = labelGetter(item, query);
     // console.log(item.name, isDisabled);
 
-    if (typeof label === 'string') {
+    if (typeof label === 'string' || typeof label === 'number') {
       extraLabelElement = extraLabelElement ? extraLabelElement.outerHTML : '';
-      element.innerHTML = label + extraLabelElement;
+      element.innerHTML = String(label) + extraLabelElement;
 
     } else if (label) {
       element.innerHTML = '';
