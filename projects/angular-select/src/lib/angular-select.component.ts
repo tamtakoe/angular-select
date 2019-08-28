@@ -2,12 +2,8 @@ import {
   Component,
   OnInit,
   Input,
-  Output,
-  EventEmitter,
   forwardRef,
-  ViewChild,
   ElementRef,
-  Renderer2,
   ComponentFactoryResolver, // for load components
   ViewEncapsulation
 } from '@angular/core';
@@ -58,6 +54,7 @@ export class AngularSelectComponent implements ControlValueAccessor, OnInit {
   @Input() options: any = {};
   @Input() getTitle;
   @Input() dontUpdate;
+  @Input() valueField;
   @Input() searchField = false;
   @Input() trackField = false;
   @Input() placeholder = 'Search';
@@ -116,14 +113,14 @@ export class AngularSelectComponent implements ControlValueAccessor, OnInit {
       placeholder: this.titlePlaceholder,
       items: this._models,
       trackField: this.trackField,
-      searchField: this.searchField
+      searchField: this.searchField,
+      valueField: this.valueField
     };
     const element = this.element.nativeElement;
     const params: any = Object.assign({}, this.options, initParams);
 
     element.addEventListener('change', (e: any) => {
       // console.log('CHANGE', e.value, element.attributes['formControlName'], this.select.value);
-// debugger
 
       // if (element.attributes['formControlName'].value === 'location') {
       //   setTimeout(() => {
@@ -132,7 +129,7 @@ export class AngularSelectComponent implements ControlValueAccessor, OnInit {
       //   }, 100)
       // } else {
       //   const value = this.select && this.select.params.multiple ? [].concat(e.value) : e.value;
-      const value = e.isTrusted ? this.select.value : e.value; //Check if internal select ivent and don't change value
+      const value = e.isTrusted ? this.select.value : e.value; // Check if internal select ivent and don't change value
 
       this.onChange(value);
       this.onTouched();
@@ -154,8 +151,6 @@ export class AngularSelectComponent implements ControlValueAccessor, OnInit {
     if (this.getTitle) {
       params.selectedItemLabelGetter = this.getTitle;
       params.dropdownItemLabelGetter = this.getTitle;
-
-      console.log(333, this.getTitle, params);
     }
 
     this.select = new Select(element, params);
@@ -167,7 +162,7 @@ export class AngularSelectComponent implements ControlValueAccessor, OnInit {
     // debugger
     // console.log('this.select.setParams', value);
     // this.myForm.patchValue({counter: 0}, {emitEvent : false});
-    this.select.setParams({value: value})
+    this.select.setParams({value: value});
   }
 
   registerOnChange(fn: (value: any) => void) {
@@ -179,7 +174,7 @@ export class AngularSelectComponent implements ControlValueAccessor, OnInit {
   }
 
   setDisabledState(isDisabled: boolean) {
-    this.select.setParams({disabled: isDisabled})
+    this.select.setParams({disabled: isDisabled});
   }
 }
 
