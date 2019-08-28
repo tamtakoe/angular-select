@@ -1,12 +1,8 @@
 {
   "name": "oi-angular-select",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "repository": {
     "type": "git",
     "url": "https://github.com/tamtakoe/oi-angular-select"
-  },
-  "peerDependencies": {
-    "@angular/common": "^7.2.0",
-    "@angular/core": "^7.2.0"
   }
 }
