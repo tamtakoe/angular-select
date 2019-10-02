@@ -51,6 +51,7 @@ export class AngularSelectComponent implements ControlValueAccessor, OnInit {
 
   @Input() size;
   @Input() multiple;
+  @Input() multipleLimit;
   @Input() options: any = {};
   @Input() getTitle;
   @Input() dontUpdate;
@@ -110,6 +111,7 @@ export class AngularSelectComponent implements ControlValueAccessor, OnInit {
       // selectionLabelGetter: this.getTitle, //TODO implement normal merge
       // itemLabelGetter: this.getTitle,
       multiple: this.multiple || this.multiple === '',
+      multipleLimit: this.multipleLimit,
       placeholder: this.titlePlaceholder,
       items: this._models,
       trackField: this.trackField,
