@@ -1,6 +1,6 @@
 import {
   Component,
-  OnInit,
+  OnChanges,
   Input,
   forwardRef,
   ElementRef,
@@ -41,121 +41,121 @@ function deepFind(obj, path) {
   styleUrls: ['./js-select/select.scss', './js-select/select-bootstrap.scss'],
   providers: [SEARCH_SELECT_VALUE_ACCESSOR]
 })
-export class AngularSelectComponent implements ControlValueAccessor, OnInit {
-// <search-select formControlName="location"
-//     [models]="locations"
-//   size="sm"
-//   dontUpdate="true"
-//   titlePlaceholder="Select location..."
-//   searchField="locationDescription"></search-select>
-
-  @Input() size;
-  @Input() multiple;
-  @Input() multipleLimit;
+export class AngularSelectComponent implements ControlValueAccessor, OnChanges {
   @Input() options: any = {};
-  @Input() getTitle;
-  @Input() dontUpdate;
-  @Input() valueField;
-  @Input() searchField = false;
-  @Input() trackField = false;
+  @Input() multiple: any;
+  @Input() multipleLimit: number;
+  @Input() removable: boolean;
+  @Input() editable: boolean;
+  @Input() creatable: boolean;
+  @Input() readonly: boolean;
+  @Input() disabled: boolean;
+  @Input() keepOpened: boolean;
+  @Input() openByRemove: boolean;
+  @Input() closeByRemove: boolean;
+  @Input() closeBySelect: boolean;
+  @Input() openByActiveRemove: boolean;
+  @Input() openByInputClick: boolean;
+  @Input() activeByOpen: boolean;
+  @Input() hideSelected: boolean;
+  @Input() useCache: boolean;
+  @Input() valueField: string;
+  @Input() groupField: string;
+  @Input() searchField: string;
+  @Input() trackField: string;
+  @Input() disabledField: string;
+  @Input() dropdownItemLabelField: string;
+  @Input() selectedItemLabelField: string;
+  @Input() emptyDropdownLabel: string;
   @Input() placeholder = 'Search';
   @Input() titlePlaceholder = 'Select...';
-  @Input()
-  get models() {
-    return this._models;
-  }
-  set models(items) {
-    this._models = items;
+  @Input() multiplePlaceholder: string;
+  @Input() position: string;
+  @Input() editItemFn: any;
+  @Input() createItemFn: any;
+  @Input() removeItemFn: any;
+  @Input() getItemsByValue: any;
+  @Input() valueFieldGetter: any;
+  @Input() groupFieldGetter: any;
+  @Input() searchFieldGetter: any;
+  @Input() trackFieldGetter: any;
+  @Input() disabledFieldGetter: any;
+  @Input() dropdownItemLabelGetter: any;
+  @Input() selectedItemLabelGetter: any;
+  @Input() customAreaGetter: any;
+  @Input() size;
+  @Input() getTitle;
+  @Input() models; // items
 
-    if (this.select) {
-      this.select.setParams({items: items});
-
-      // if (!this.dontUpdate) {
-      //   const value = null;
-      //   console.log('models value', value);
-      //   debugger
-      //   this.select.setParams({value: value});
-      //   // this.select.selectItems(value);
-      //   this.onChange(value);
-      //   this.onTouched(value);
-      // }
-    }
-    // this.select.setParams({items: items})
-
-  }
-
-  @Input()
-  set disabled(isDisabled) {
-    if (this.select) {
-      this.select.setParams({disabled: isDisabled});
-    }
-  }
-  // @Input() titleField;
-
-  // @ViewChild('select') el:ElementRef;
-
-  //@ViewChild(SearchVersionPanelDirective) private searchVersionPanelHost: SearchVersionPanelDirective; //for load components
-
+  select: Select;
   private onChange = (value: any) => {};
   private onTouched = () => {};
 
-  select: Select;
-  selectedItems;
-  _models = [];
-  titleField;
-
   constructor(private componentFactoryResolver: ComponentFactoryResolver, private element: ElementRef) {}
-
-  ngOnInit() {
-    const initParams = {
+  collectOptions() {
+    return {
       // selectionLabelGetter: this.getTitle, //TODO implement normal merge
       // itemLabelGetter: this.getTitle,
       multiple: this.multiple || this.multiple === '',
-      multipleLimit: this.multipleLimit,
-      placeholder: this.titlePlaceholder,
-      items: this._models,
-      trackField: this.trackField,
+      multipleLimit: this.multipleLimit >= 0 ? this.multipleLimit : Infinity,
+      removable: this.removable,
+      editable: this.editable,
+      creatable: this.creatable,
+      readonly: this.readonly,
+      disabled: this.disabled,
+      keepOpened: this.keepOpened,
+      openByRemove: this.openByRemove,
+      closeByRemove: this.closeByRemove,
+      closeBySelect: this.closeBySelect,
+      openByActiveRemove: this.openByActiveRemove,
+      openByInputClick: this.openByInputClick,
+      activeByOpen: this.activeByOpen,
+      hideSelected: this.hideSelected,
+      useCache: this.useCache,
+      valueField: this.valueField,
+      groupField: this.groupField,
       searchField: this.searchField,
-      valueField: this.valueField
+      trackField: this.trackField,
+      disabledField: this.disabledField,
+      dropdownItemLabelField: this.dropdownItemLabelField,
+      selectedItemLabelField: this.selectedItemLabelField,
+      emptyDropdownLabel: this.emptyDropdownLabel,
+      placeholder: this.placeholder,
+      titlePlaceholder: this.titlePlaceholder,
+      multiplePlaceholder: this.multiplePlaceholder,
+      position: this.position,
+      editItemFn: this.editItemFn,
+      createItemFn: this.createItemFn,
+      removeItemFn: this.removeItemFn,
+      getItemsByValue: this.getItemsByValue,
+      valueFieldGetter: this.valueFieldGetter,
+      groupFieldGetter: this.groupFieldGetter,
+      searchFieldGetter: this.searchFieldGetter,
+      trackFieldGetter: this.trackFieldGetter,
+      disabledFieldGetter: this.disabledFieldGetter,
+      dropdownItemLabelGetter: this.dropdownItemLabelGetter || this.getTitle,
+      selectedItemLabelGetter: this.selectedItemLabelGetter || this.getTitle,
+      customAreaGetter: this.customAreaGetter,
+      items: this.models
     };
-    const element = this.element.nativeElement;
-    const params: any = Object.assign({}, this.options, initParams);
+  }
 
-    element.addEventListener('change', (e: any) => {
-      // console.log('CHANGE', e.value, element.attributes['formControlName'], this.select.value);
+  ngOnChanges(ch) {
+    if (!this.select) {
+      const element = this.element.nativeElement;
+      const options: any = Object.assign({}, this.options, this.collectOptions());
 
-      // if (element.attributes['formControlName'].value === 'location') {
-      //   setTimeout(() => {
-      //     this.onChange(e.value);
-      //     this.onTouched();
-      //   }, 100)
-      // } else {
-      //   const value = this.select && this.select.params.multiple ? [].concat(e.value) : e.value;
-      const value = e.isTrusted ? this.select.value : e.value; // Check if internal select ivent and don't change value
+      element.addEventListener('change', (e: any) => {
+        const value = e.isTrusted ? this.select.value : e.value; // Check if internal select ivent and don't change value
 
-      this.onChange(value);
-      this.onTouched();
-      // }
+        this.onChange(value);
+        this.onTouched();
+      });
 
-
-    });
-
-    // element.addEventListener('click:selected', (e: any) => {
-    //   console.log(123, e.detail.item);
-    //
-    //   const instanceSelectAreaElement = e.detail.element.querySelector('.instance-select-area');
-    //   // const instanceSelectElement =
-    //   // instanceSelectAreaElement.appendChild()
-    //   const instanceOptions = e.detail.item.instances.map(instance => `<option>${instance.server.name}</option>`).join('');
-    //   // instanceSelectAreaElement.innerHTML = `<select>${instanceOptions}</select>`
-    // })
-
-    if (this.getTitle) {
-      params.selectedItemLabelGetter = this.getTitle;
-      params.dropdownItemLabelGetter = this.getTitle;
+      this.select = new Select(element, options);
+    } else {
+      this.select.setParams(this.collectOptions());
     }
-
-    this.select = new Select(element, params);
   }
 
   /** ControlValueAccessor interface methods. **/
@@ -164,7 +164,7 @@ export class AngularSelectComponent implements ControlValueAccessor, OnInit {
     // debugger
     // console.log('this.select.setParams', value);
     // this.myForm.patchValue({counter: 0}, {emitEvent : false});
-    this.select.setParams({value: value});
+    this.select.setParams({value});
   }
 
   registerOnChange(fn: (value: any) => void) {

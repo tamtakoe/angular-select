@@ -7,6 +7,7 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'oi-angular-select';
+  limit = 1;
 
   items = [
     { name: 'one', value: 1 },
