@@ -9,11 +9,11 @@ Run `ng generate component component-name --project angular-select` to generate 
 
 ## Build
 
-Run `ng build angular-select` to build the project. The build artifacts will be stored in the `dist/` directory.
+Run `ng build angular-select --prod` to build the project. The build artifacts will be stored in the `dist/` directory.
 
 ## Publishing
 
-After building your library with `ng build angular-select`, go to the dist folder `cd dist/angular-select` and run `npm publish`.
+After building your library with `ng build angular-select --prod`, go to the dist folder `cd dist/angular-select` and run `npm publish`.
 
 ## Running unit tests
 
