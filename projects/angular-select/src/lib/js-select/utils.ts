@@ -2,17 +2,17 @@ import { myer } from './myer-array-diff';
 
 /**
  * Merge object by another one. Use default value if new value is undefined or null
- * @param obj
- * @param newObj
- * @param defaults
- * @returns {any}
+ * @param obj Source
+ * @param newObj Data to merge
+ * @param defaults Default values
+ * @returns Extended source object
  */
-export function mergeWithDefaults(obj, newObj = {}, defaults = {}) {
-    for (let k in newObj) {
-        const newValue = newObj[k];
-
+export function mergeWithDefaults(obj: any, newObj: any = {}, defaults: any = {}): any {
+    for (const k in newObj) {
         if (newObj.hasOwnProperty(k)) {
-            obj[k] = newValue != null ? newValue :  defaults[k]; //(obj[k] != null ? obj[k] : defaults[k]);
+          const newValue = newObj[k];
+
+          obj[k] = newValue != null ? newValue :  defaults[k]; // (obj[k] != null ? obj[k] : defaults[k]);
         }
     }
     return obj;
@@ -21,12 +21,14 @@ export function mergeWithDefaults(obj, newObj = {}, defaults = {}) {
 /**
  * Return DOM element which is/into container and contains defined class
  *
- * @param {HTMLElement} element
- * @param {HTMLElement} containerElement
- * @param {string} className
- * @returns {HTMLElement}
+ * @param element Source
+ * @param containerElement Global container
+ * @param className CSS class which we have to find
+ * @returns Container
  */
-export function getElementContainer(element: HTMLElement, containerElement: HTMLElement = document.body, className?:string) {
+export function getElementContainer(element: HTMLElement | null,
+                                    containerElement: HTMLElement = document.body,
+                                    className?: string): HTMLElement | void {
     while (element && element.classList && element.ownerDocument && element.nodeType !== 11 ) { // 11 - DOCUMENT_FRAGMENT_NODE
         if ((className && element.className.indexOf(className) >= 0) || (!className && element === containerElement)) { // current.classList.contains(className) doesn't work in IE9
             return element;
@@ -39,13 +41,15 @@ export function getElementContainer(element: HTMLElement, containerElement: HTML
 /**
  * Simulate focus/blur events of the inner input element to the outer element
  *
- * @param {HTMLElement} element
- * @param {HTMLElement} inputElement
- * @param {HTMLElement} isolatedClass for area which is independent on click event
+ * @param element
+ * @param inputElement
+ * @param isolatedClass for area which is independent on click event
  * @returns {function} unbind function for listeners.
  */
-export function bindFocusBlur(element: HTMLElement, inputElement: HTMLElement, isolatedClass = 'isolated') {
-    let isFocused, isMousedown, isBlur, shadowHost, parentNode: any = element.parentNode;
+export function bindFocusBlur(element: HTMLElement,
+                              inputElement: HTMLElement,
+                              isolatedClass = 'isolated'): { unbind: () => void; element: HTMLElement; inputElement: HTMLElement } {
+    let isFocused: boolean, isMousedown: boolean, isBlur: boolean, shadowHost: any, parentNode: any = element.parentNode;
 
     document.addEventListener('click', clickHandler, true);
     element.addEventListener('mousedown', mousedownHandler, true);
@@ -61,10 +65,10 @@ export function bindFocusBlur(element: HTMLElement, inputElement: HTMLElement, i
         parentNode = parentNode.parentNode;
     }
 
-    function blurHandler(event?) {
+    function blurHandler(event?: Event) {
         // console.log('+++ blurHandler', isMousedown);
         // if (event && event.target.nodeName !== 'INPUT') return; //for IE
-        if (event && event.target !== inputElement) return; //for IE
+        if (event && event.target !== inputElement) { return; } // for IE
 
         isBlur = false;
         isFocused = false;
@@ -74,7 +78,7 @@ export function bindFocusBlur(element: HTMLElement, inputElement: HTMLElement, i
             return;
         }
 
-        setTimeout(function () {
+        setTimeout(function() {
             element.dispatchEvent(new Event('blur'));
             // element.dispatchEvent(new Event('blur', {bubbles: true, composed: true}));
         });
@@ -85,7 +89,7 @@ export function bindFocusBlur(element: HTMLElement, inputElement: HTMLElement, i
         if (!isFocused) {
             isFocused = true;
 
-            setTimeout(function () {
+            setTimeout(function() {
                 element.dispatchEvent(new Event('focus'));
             });
         }
@@ -96,18 +100,18 @@ export function bindFocusBlur(element: HTMLElement, inputElement: HTMLElement, i
         isMousedown = true;
     }
 
-    function clickHandler(event) {
+    function clickHandler(event: Event) {
 
         // console.log('+++ clickHandler', !!getElementContainer(event.target, element), event.target, event.target !== inputElement, event.target.nodeName);
         isMousedown = false;
 
 
-        const activeElement = shadowHost && event.target === shadowHost ? element : event.target;
+        const activeElement: HTMLElement = shadowHost && event.target === shadowHost ? element : event.target as HTMLElement;
 
         const isIsolatedElement = !!getElementContainer(activeElement, element, isolatedClass);
 
         if (isIsolatedElement) {
-          return
+          return;
         }
 
         const isSelectElement = !!getElementContainer(activeElement, element);
@@ -118,7 +122,7 @@ export function bindFocusBlur(element: HTMLElement, inputElement: HTMLElement, i
 
         // if (isSelectElement && activeElement.nodeName !== 'INPUT') {
         if (isSelectElement && activeElement !== inputElement) {
-            setTimeout(function () {
+            setTimeout(function() {
                 inputElement.focus();
             });
         }
@@ -129,15 +133,15 @@ export function bindFocusBlur(element: HTMLElement, inputElement: HTMLElement, i
     }
 
     return {
-        element: element,
-        inputElement: inputElement,
+        element,
+        inputElement,
         unbind: () => {
             document.removeEventListener('click', clickHandler, true);
             element.removeEventListener('mousedown', mousedownHandler, true);
             element.removeEventListener('blur', blurHandler, true);
             inputElement.removeEventListener('focus', focusHandler);
         }
-    }
+    };
 
     // return {
     //     unbindAll: () => {
@@ -168,18 +172,18 @@ export function bindFocusBlur(element: HTMLElement, inputElement: HTMLElement, i
  * @param {object} list
  * @param {object} item
  */
-export function scrollActiveOption(list, item) {
+export function scrollActiveOption(list: HTMLElement, item: HTMLElement): void {
     let y, height_menu, height_item, scroll, scroll_top, scroll_bottom;
 
     if (item) {
         height_menu = list.offsetHeight;
-        height_item = getWidthOrHeight(item, 'height', 'margin'); //outerHeight(true);
+        height_item = getWidthOrHeight(item, 'height', 'margin'); // outerHeight(true);
         scroll = list.scrollTop || 0;
         y = getOffset(item).top - getOffset(list).top + scroll;
         scroll_top = y;
         scroll_bottom = y - height_menu + height_item;
 
-        //TODO Make animation
+        // TODO Make animation
         if (y + height_item > height_menu + scroll) {
             list.scrollTop = scroll_bottom;
         } else if (y < scroll) {
@@ -190,9 +194,9 @@ export function scrollActiveOption(list, item) {
 
 // Used for matching numbers
 const core_pnum = /[+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|)/.source;
-const rnumnonpx = new RegExp("^(" + core_pnum + ")(?!px)[a-z%]+$", "i");
+const rnumnonpx = new RegExp('^(' + core_pnum + ')(?!px)[a-z%]+$', 'i');
 
-function augmentWidthOrHeight(elem, name, extra, isBorderBox, styles) {
+function augmentWidthOrHeight(elem: HTMLElement, name: keyof CSSStyleDeclaration, extra: string, isBorderBox: boolean, styles: CSSStyleDeclaration) {
     let i = extra === (isBorderBox ? 'border' : 'content') ?
         // If we already have the right measurement, avoid augmentation
         4 :
@@ -202,33 +206,33 @@ function augmentWidthOrHeight(elem, name, extra, isBorderBox, styles) {
         val = 0,
         cssExpand = ['Top', 'Right', 'Bottom', 'Left'];
 
-    //TODO Use angular.element.css instead of getStyleValue after https://github.com/caitp/angular.js/commit/92bbb5e225253ebddd38ef5735d66ffef76b6a14 will be applied
-    function getStyleValue(name) {
-        return parseFloat(styles[name]);
+    // TODO Use angular.element.css instead of getStyleValue after https://github.com/caitp/angular.js/commit/92bbb5e225253ebddd38ef5735d66ffef76b6a14 will be applied
+    function getStyleValue(name: keyof CSSStyleDeclaration): number {
+        return parseFloat(<string> styles[name]);
     }
 
     for (; i < 4; i += 2) {
         // both box models exclude margin, so add it if we want it
         if (extra === 'margin') {
-            val += getStyleValue(extra + cssExpand[i]);
+            val += getStyleValue(extra + cssExpand[i] as keyof CSSStyleDeclaration);
         }
 
         if (isBorderBox) {
             // border-box includes padding, so remove it if we want content
             if (extra === 'content') {
-                val -= getStyleValue('padding' + cssExpand[i]);
+                val -= getStyleValue('padding' + cssExpand[i] as keyof CSSStyleDeclaration);
             }
 
             // at this point, extra isn't border nor margin, so remove border
             if (extra !== 'margin') {
-                val -= getStyleValue('border' + cssExpand[i] + 'Width');
+                val -= getStyleValue('border' + cssExpand[i] + 'Width' as keyof CSSStyleDeclaration);
             }
         } else {
-            val += getStyleValue('padding' + cssExpand[i]);
+            val += getStyleValue('padding' + cssExpand[i] as keyof CSSStyleDeclaration);
 
             // at this point, extra isn't content nor padding, so add border
             if (extra !== 'padding') {
-                val += getStyleValue('border' + cssExpand[i] + 'Width');
+                val += getStyleValue('border' + cssExpand[i] + 'Width' as keyof CSSStyleDeclaration);
             }
         }
     }
@@ -236,13 +240,13 @@ function augmentWidthOrHeight(elem, name, extra, isBorderBox, styles) {
     return val;
 }
 
-function getOffset(elem) {
+function getOffset(elem: HTMLElement) {
     let docElem, win,
         box = elem.getBoundingClientRect(),
         doc = elem && elem.ownerDocument;
 
     if (!doc) {
-        return;
+        return { top: 0, left: 0 };
     }
 
     docElem = doc.documentElement;
@@ -254,45 +258,45 @@ function getOffset(elem) {
     };
 }
 
-function getWindow(elem) {
+function getWindow(elem: any) {
     return elem != null && elem === elem.window ? elem : elem.nodeType === 9 && elem.defaultView;
 }
 
-function getWidthOrHeight(elem, name, extra) {
+function getWidthOrHeight(elem: HTMLElement, name: keyof CSSStyleDeclaration, extra: string) {
     // Start with offset property, which is equivalent to the border-box selectedItems
     let valueIsBorderBox = true,
         val = name === 'width' ? elem.offsetWidth : elem.offsetHeight,
         styles = window.getComputedStyle(elem, null),
 
-        //TODO Make isBorderBox after https://github.com/caitp/angular.js/commit/92bbb5e225253ebddd38ef5735d66ffef76b6a14 will be applied
-        isBorderBox = false; //jQuery.support.boxSizing && jQuery.css( elem, "boxSizing", false, styles ) === "border-box";
+        // TODO Make isBorderBox after https://github.com/caitp/angular.js/commit/92bbb5e225253ebddd38ef5735d66ffef76b6a14 will be applied
+        isBorderBox = false; // jQuery.support.boxSizing && jQuery.css( elem, "boxSizing", false, styles ) === "border-box";
 
     // some non-html elements return undefined for offsetWidth, so check for null/undefined
     // svg - https://bugzilla.mozilla.org/show_bug.cgi?id=649285
     // MathML - https://bugzilla.mozilla.org/show_bug.cgi?id=491668
     if (val <= 0 || val == null) {
         // Fall back to computed then uncomputed css if necessary
-        val = styles[name];
+        val = <number> styles[name];
 
         if (val < 0 || val == null) {
-            val = elem.style[name];
+            val = <number> elem.style[name];
         }
 
         // Computed unit is not pixels. Stop here and return.
-        if (rnumnonpx.test(val)) {
+        if (rnumnonpx.test(String(val))) {
             return val;
         }
 
         // we need the check for style in case a browser which returns unreliable values
         // for getComputedStyle silently falls back to the reliable elem.style
-        //valueIsBorderBox = isBorderBox && ( jQuery.support.boxSizingReliable || val === elem.style[ name ] );
+        // valueIsBorderBox = isBorderBox && ( jQuery.support.boxSizingReliable || val === elem.style[ name ] );
 
         // Normalize "", auto, and prepare for extra
-        val = parseFloat(val) || 0;
+        val = parseFloat(String(val)) || 0;
     }
 
     // use the active box-sizing model to add/subtract irrelevant styles
-    return val + augmentWidthOrHeight(elem, name, extra || ( isBorderBox ? "border" : "content" ), valueIsBorderBox, styles);
+    return val + augmentWidthOrHeight(elem, name, extra || ( isBorderBox ? 'border' : 'content' ), valueIsBorderBox, styles);
 }
 
 /**
@@ -302,16 +306,16 @@ function getWidthOrHeight(elem, name, extra) {
  * @param defaultMenuHeightPx
  * @returns {boolean}
  */
-export function hasNoSpaceBelowForMenu(toggleElement, menuElement, defaultMenuHeightPx = 100) {
+export function hasNoSpaceBelowForMenu(toggleElement: HTMLElement, menuElement: HTMLElement, defaultMenuHeightPx = 100) {
     const spaceAbove = toggleElement.getBoundingClientRect().top;
     const spaceBelow = window.innerHeight - toggleElement.getBoundingClientRect().bottom;
-    const maxMenuHeight = parseInt(window.getComputedStyle(menuElement)['max-height']) || defaultMenuHeightPx;
+    const maxMenuHeight = parseInt(window.getComputedStyle(menuElement)['max-height' as any]) || defaultMenuHeightPx;
 
     return spaceBelow < maxMenuHeight && spaceBelow < spaceAbove;
 }
 
-export function groupsIsEmpty(groups) {
-    for (let k in groups) {
+export function groupsIsEmpty(groups: any) {
+    for (const k in groups) {
         if (groups.hasOwnProperty(k) && groups[k].length) {
             return false;
         }
@@ -355,7 +359,7 @@ export function intersection(xArr: any[], yArr: any[], getter?: Function, invert
  * @param {boolean} strict
  * @returns {any}
  */
-function deepEqual(actual, expected, strict = true) {
+function deepEqual(actual: any, expected: any, strict = true) {
     if (actual === expected) {
         return true;
 
@@ -378,45 +382,47 @@ function deepEqual(actual, expected, strict = true) {
  * @param strict
  * @returns {boolean}
  */
-function objEqual(a, b, strict) {
+function objEqual(a: any, b: any, strict: boolean) {
     let i, key;
 
     if (a == null || b == null) {
         return false;
     }
 
-    if (a.prototype !== b.prototype) return false;
+    if (a.prototype !== b.prototype) { return false; }
 
     try {
-        let ka = Object.keys(a),
+        const ka = Object.keys(a),
             kb = Object.keys(b);
 
-        if (ka.length !== kb.length)
+        if (ka.length !== kb.length) {
             return false;
+        }
 
         ka.sort();
         kb.sort();
 
-        //cheap key test
+        // cheap key test
         for (i = ka.length - 1; i >= 0; i--) {
-            if (ka[i] != kb[i])
+            if (ka[i] != kb[i]) {
                 return false;
+            }
         }
 
-        //possibly expensive deep test
+        // possibly expensive deep test
         for (i = ka.length - 1; i >= 0; i--) {
             key = ka[i];
-            if (!deepEqual(a[key], b[key], strict)) return false;
+            if (!deepEqual(a[key], b[key], strict)) { return false; }
         }
 
         return typeof a === typeof b;
 
-    } catch (e) {//happens when one is a string literal and the other isn't
+    } catch (e) {// happens when one is a string literal and the other isn't
         return false;
     }
 }
 
-function toString(value) {
+function toString(value: any) {
     return String(value !== void 0 ? value : '');
 }
 
@@ -453,7 +459,7 @@ export function ascSort(items: any, query: any, getLabel: Function, options: {fi
     let getLabelArr: any[] = [getLabel];
 
     if (options.fields) {
-        getLabelArr = options.fields.map(field => typeof field === 'function' ? field : item => deepFind(item, field, true))
+        getLabelArr = options.fields.map(field => typeof field === 'function' ? field : (item: any) => deepFind(item, field, true));
     }
 
     getLabel = getLabelArr[0];
@@ -472,7 +478,7 @@ export function ascSort(items: any, query: any, getLabel: Function, options: {fi
 
                 isFound = label === query || !strict && label == query || query !== undefined && matchRegExp.test(toString(label));
 
-                if (isFound) break;
+                if (isFound) { break; }
             }
 
             if (isFound) {
@@ -522,8 +528,8 @@ export function ascSort(items: any, query: any, getLabel: Function, options: {fi
  * @param {(option) => string} groupNameGetter
  * @returns {{: Array}}
  */
-export function distributeOptionsByGroup(options = [], groupNameGetter = (item) => '') {
-    let optionGroups = {'':[]},
+export function distributeOptionsByGroup(options = [], groupNameGetter = (item: any) => '') {
+    let optionGroups: {[k: string]: any[]} = {'': []},
         optionGroupName,
         optionGroup;
 
@@ -539,7 +545,7 @@ export function distributeOptionsByGroup(options = [], groupNameGetter = (item) 
     return optionGroups;
 }
 
-export function findIndex(items = [], item, trackByGetter = (item) => item) {
+export function findIndex(items = [], item: any, trackByGetter = (item: any) => item): number | void {
     for (let i = 0; i < items.length; i++) {
         if (trackByGetter(items[i]) === trackByGetter(item)) {
             return i;
@@ -547,7 +553,7 @@ export function findIndex(items = [], item, trackByGetter = (item) => item) {
     }
 }
 
-export function removeChildren(element) {
+export function removeChildren(element: HTMLElement) {
     while (element.firstChild) {
         element.removeChild(element.firstChild);
     }
@@ -562,22 +568,26 @@ export function removeChildren(element) {
  * @param {boolean} appendUndefinedItems - place undefined items to the end of list (they prepend by default)
  * @returns {HTMLElement} containerElement with changes
  */
-export function updateElements(containerElement: HTMLElement, newItems: any[], elementConstructor: (item) => Element, trackFieldGetter?: Function, appendUndefinedItems?: boolean) {
+export function updateElements(containerElement: HTMLElement,
+                               newItems: any[],
+                               elementConstructor: (item: any) => Element,
+                               trackFieldGetter?: Function,
+                               appendUndefinedItems?: boolean) {
     const elementsArr = Array.from(containerElement.children);
-    const track = (item) => {
+    const track = (item: any) => {
         const id = item !== undefined && (trackFieldGetter ? trackFieldGetter(item) : item);
 
-        if (id || id === 0) return id;
+        if (id || id === 0) { return id; }
     };
     const uncountableElementId = new Error('Uncountable element'); // We use this id for interface (no data) elements
-    let newItemIds,
-        itemsMap,
+    let newItemIds: any[],
+        itemsMap: Map<any, any>,
         oldItemIds;
 
     if (trackFieldGetter) {
         oldItemIds = elementsArr.map((element: any) => element.hasOwnProperty('data') ? track(element.data) : uncountableElementId);
         newItemIds = [];
-        itemsMap = new Map(); //trackFieldGetter can return original item by default
+        itemsMap = new Map(); // trackFieldGetter can return original item by default
         newItems.forEach(item => {
             const itemId = track(item);
 
@@ -600,27 +610,27 @@ export function updateElements(containerElement: HTMLElement, newItems: any[], e
     });
 
     const instructions = myer.diff(oldItemIds, newItemIds);
-    const operations = instructions.map(args => { //convert id to element for insert operations
-        if (args.hasOwnProperty(2)) { //if we have ids for new elements
+    const operations = instructions.map((args: any[]) => { // convert id to element for insert operations
+        if (args.hasOwnProperty(2)) { // if we have ids for new elements
             return args.map((arg, i) => i < 2 ? arg : elementConstructor(itemsMap ? itemsMap.get(arg) : arg));
         }
         return args;
     });
 
-    operations.forEach(operation => {
+    operations.forEach((operation: any) => {
         if (operation.hasOwnProperty(1)) {
             removeElements(containerElement, operation[0], operation[1]);
         }
 
         if (operation.hasOwnProperty(2)) {
-            addElements(containerElement, operation[0], operation.slice(2))
+            addElements(containerElement, operation[0], operation.slice(2));
         }
     });
 
     return containerElement;
 }
 
-function removeElements(containerElement, startIndex, amount) {
+function removeElements(containerElement: HTMLElement, startIndex: number, amount: number) {
     const children = containerElement.children;
 
     for (let i = 0; i < amount; i++) {
@@ -628,13 +638,13 @@ function removeElements(containerElement, startIndex, amount) {
     }
 }
 
-function addElements(containerElement, startIndex, newElements) {
+function addElements(containerElement: HTMLElement, startIndex: number, newElements: HTMLElement[]) {
     const children = containerElement.children;
 
     if (startIndex) {
         children[startIndex - 1].after.apply(children[startIndex - 1], newElements);
     } else {
-        containerElement.prepend.apply(containerElement, newElements)
+        containerElement.prepend.apply(containerElement, newElements);
     }
 }
 
@@ -646,10 +656,10 @@ function addElements(containerElement, startIndex, newElements) {
  * @param {Object} object
  * @returns {{} & Object}
  */
-export function deepReplace(oldVal: any, newVal: any, object: object) {
-    const newObject = copy(object);
+export function deepReplace(oldVal: any, newVal: any, object: any) {
+    const newObject: any = copy(object);
 
-    Object.keys(object).forEach(key => {
+    Object.keys(object).forEach((key: string) => {
         const val = object[key];
 
         if (val === oldVal) {
@@ -669,10 +679,10 @@ export function deepReplace(oldVal: any, newVal: any, object: object) {
  * @param {Object} obj
  * @returns {Array | {}}
  */
-function copy(obj: object) {
-    const clone = {};
+function copy(obj: any) {
+    const clone: any = {};
 
-    for(let i in obj) {
+    for (const i in obj) {
         if (obj[i] != null && typeof obj[i] === 'object') {
             clone[i] = copy(obj[i]);
         } else {
@@ -694,7 +704,7 @@ function copy(obj: object) {
  * @returns {any}
  */
 export function deepFind(obj: any, path: string, originalIfNotFound?: boolean) {
-    if (!path || typeof obj !== 'object') return originalIfNotFound ? obj : undefined;
+    if (!path || typeof obj !== 'object') { return originalIfNotFound ? obj : undefined; }
 
     const paths = path.split('.');
     let i, current = obj;
@@ -740,12 +750,12 @@ export function highlight(str: string = '', substr: string = '', tagName?: strin
  * @param timeout
  * @returns {(e) => any}
  */
-export function debounceEventValue(fn, timeout) {
-    let timer = null;
+export function debounceEventValue(this: any, fn: Function, timeout: number): Function {
+    let timer: number | null;
 
-    return function (e) {
+    return (e: Event | any) => {
         // Save `e.target.value` to value because `e` will be changed in shadow-dom case
-        const value = e.target.value;
+        const value = e.target?.value;
         const onComplete = () => {
             fn.call(this, value);
             timer = null;
@@ -763,13 +773,13 @@ export function debounceEventValue(fn, timeout) {
 export function getItemsByField(fields: any, items: any[], fieldGetter: Function) {
     fields = Array.isArray(fields) ? fields : [fields];
 
-    return fields.map(field => {
+    return fields.map((field: any) => {
         return items.find(item => fieldGetter(item) === field);
-    }).filter(item => item);
+    }).filter((item: any) => item);
 }
 
-export const noopPipe = (item?) => item;
-export const noop = (item?) => {};
+export const noopPipe = (item?: any) => item;
+export const noop = (item?: any) => {};
 
 
 /**
@@ -790,14 +800,14 @@ export class QueryCache {
         // Remove duplicates, remove all except ''
         this.cache = this.cache.filter(cacheItem => cacheItem.q !== query && cacheItem.q === '');
 
-        this.cache.unshift({q: query, v: value, t: (new Date().getTime())})
+        this.cache.unshift({q: query, v: value, t: (new Date().getTime())});
     }
 
     clear() {
         this.cache = [];
     }
 
-    private getValue(cacheItem) {
+    private getValue(cacheItem: { q: string; v: any; t: number; } | undefined) {
         if (cacheItem) {
             return cacheItem.v;
         }

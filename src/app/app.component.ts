@@ -7,7 +7,7 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'oi-angular-select';
-  limit = 1;
+  limit = 3;
 
   items = [
     { name: 'one', value: 1 },
@@ -23,4 +23,14 @@ export class AppComponent {
   ];
 
   item = [];
+
+  options = {
+    getItems: (query) => {
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          resolve(this.items.filter(item => item.name.startsWith(query)));
+        }, 1000)
+      })
+    }
+  };
 }

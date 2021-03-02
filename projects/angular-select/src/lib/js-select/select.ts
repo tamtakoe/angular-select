@@ -518,7 +518,9 @@ export class Select extends SelectDom {
         const itemIndex = findIndex(this.selectedItems, selectedItem, this.params.trackFieldGetter);
 
         this.setElementLoading(selectedElement, false);
-        this.selectedItems.splice(itemIndex, 1); //Объединить?
+        if (typeof itemIndex === "number") {
+          this.selectedItems.splice(itemIndex, 1);
+        } //Объединить?
         this.removeElement(selectedElement);
         // this.clearSearch();
 
@@ -584,7 +586,6 @@ export class Select extends SelectDom {
 
   inputFieldClick() {
     if (this.isDisabled) return;
-
     if (this.params.openByInputClick && (this.params.multiple || !this.selectedItems.length)) {
       this.open();
     }
@@ -642,8 +643,12 @@ export class Select extends SelectDom {
           const lastSelectedElement = this.findLastChildElementWithData(this.tmpl.searchContainer);
 
           this.deselectItem(lastSelectedElement);
-          break;
+
+        } else if (this.params.multiple) {
+          this.setActiveSelectedElement();
         }
+        break;
+
       default: // any key
         if (this.params.multiple) {
           this.setActiveSelectedElement();

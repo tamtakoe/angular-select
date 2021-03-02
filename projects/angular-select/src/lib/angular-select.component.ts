@@ -2,14 +2,15 @@ import {
   Component,
   OnChanges,
   Input,
+  Output,
   forwardRef,
   ElementRef,
+  EventEmitter,
   ComponentFactoryResolver, // for load components
-  ViewEncapsulation
+  ViewEncapsulation,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { Select } from './js-select/select';
-
 
 export const SEARCH_SELECT_VALUE_ACCESSOR: any = {
   provide: NG_VALUE_ACCESSOR,
@@ -17,21 +18,21 @@ export const SEARCH_SELECT_VALUE_ACCESSOR: any = {
   multi: true,
 };
 
-function deepFind(obj, path) {
-  if (!path) return obj;
-
-  const paths = path.split('.');
-  let i, current = obj;
-
-  for (i = 0; i < paths.length; ++i) {
-    if (current[paths[i]] == undefined) {
-      return undefined;
-    } else {
-      current = current[paths[i]];
-    }
-  }
-  return current;
-}
+// function deepFind(obj: any, path: string) {
+//   if (!path) return obj;
+//
+//   const paths = path.split('.');
+//   let i, current = obj;
+//
+//   for (i = 0; i < paths.length; ++i) {
+//     if (current[paths[i]] == undefined) {
+//       return undefined;
+//     } else {
+//       current = current[paths[i]];
+//     }
+//   }
+//   return current;
+// }
 
 
 @Component({
@@ -44,33 +45,33 @@ function deepFind(obj, path) {
 export class AngularSelectComponent implements ControlValueAccessor, OnChanges {
   @Input() options: any = {};
   @Input() multiple: any;
-  @Input() multipleLimit: number;
-  @Input() removable: boolean;
-  @Input() editable: boolean;
-  @Input() creatable: boolean;
-  @Input() readonly: boolean;
-  @Input() disabled: boolean;
-  @Input() keepOpened: boolean;
-  @Input() openByRemove: boolean;
-  @Input() closeByRemove: boolean;
-  @Input() closeBySelect: boolean;
-  @Input() openByActiveRemove: boolean;
-  @Input() openByInputClick: boolean;
-  @Input() activeByOpen: boolean;
-  @Input() hideSelected: boolean;
-  @Input() useCache: boolean;
-  @Input() valueField: string;
-  @Input() groupField: string;
-  @Input() searchField: string;
-  @Input() trackField: string;
-  @Input() disabledField: string;
-  @Input() dropdownItemLabelField: string;
-  @Input() selectedItemLabelField: string;
-  @Input() emptyDropdownLabel: string;
+  @Input() multipleLimit: number | undefined;
+  @Input() removable: boolean | undefined;
+  @Input() editable: boolean | undefined;
+  @Input() creatable: boolean | undefined;
+  @Input() readonly: boolean | undefined;
+  @Input() disabled: boolean | undefined;
+  @Input() keepOpened: boolean | undefined;
+  @Input() openByRemove: boolean | undefined;
+  @Input() closeByRemove: boolean | undefined;
+  @Input() closeBySelect: boolean | undefined;
+  @Input() openByActiveRemove: boolean | undefined;
+  @Input() openByInputClick: boolean = true;
+  @Input() activeByOpen: boolean | undefined;
+  @Input() hideSelected: boolean | undefined;
+  @Input() useCache: boolean | undefined;
+  @Input() valueField: string | undefined;
+  @Input() groupField: string | undefined;
+  @Input() searchField: string | undefined;
+  @Input() trackField: string | undefined;
+  @Input() disabledField: string | undefined;
+  @Input() dropdownItemLabelField: string | undefined;
+  @Input() selectedItemLabelField: string | undefined;
+  @Input() emptyDropdownLabel: string | undefined;
   @Input() placeholder = 'Search';
   @Input() titlePlaceholder = 'Select...';
-  @Input() multiplePlaceholder: string;
-  @Input() position: string;
+  @Input() multiplePlaceholder: string | undefined;
+  @Input() position: string | undefined;
   @Input() editItemFn: any;
   @Input() createItemFn: any;
   @Input() removeItemFn: any;
@@ -83,17 +84,16 @@ export class AngularSelectComponent implements ControlValueAccessor, OnChanges {
   @Input() dropdownItemLabelGetter: any;
   @Input() selectedItemLabelGetter: any;
   @Input() customAreaGetter: any;
-  @Input() size;
-  @Input() getTitle;
-  @Input() models; // items
+  @Input() size: any;
+  @Input() getTitle: any;
+  @Input() models: any;
 
-  select: Select;
-  private onChange = (value: any) => {};
-  private onTouched = () => {};
+  select: Select | undefined;
 
   constructor(private componentFactoryResolver: ComponentFactoryResolver, private element: ElementRef) {}
-  collectOptions() {
-    return {
+
+  collectOptions(this: any) {
+    const options = {
       // selectionLabelGetter: this.getTitle, //TODO implement normal merge
       // itemLabelGetter: this.getTitle,
       multiple: this.multiple || this.multiple === '',
@@ -138,15 +138,21 @@ export class AngularSelectComponent implements ControlValueAccessor, OnChanges {
       customAreaGetter: this.customAreaGetter,
       items: this.models
     };
+
+    if (!options.items) { // TODO Change options detection in base-select
+      delete options.items;
+    }
+
+    return options;
   }
 
-  ngOnChanges(ch) {
+  ngOnChanges(this: any) {
     if (!this.select) {
       const element = this.element.nativeElement;
       const options: any = Object.assign({}, this.options, this.collectOptions());
 
       element.addEventListener('change', (e: any) => {
-        const value = e.isTrusted ? this.select.value : e.value; // Check if internal select ivent and don't change value
+        const value = e.isTrusted ? this.select.value : e.value; // Check if internal select event and don't change value
 
         this.onChange(value);
         this.onTouched();
@@ -167,7 +173,7 @@ export class AngularSelectComponent implements ControlValueAccessor, OnChanges {
     this.select.setParams({value});
   }
 
-  registerOnChange(fn: (value: any) => void) {
+  registerOnChange(fn: () => void) {
     this.onChange = fn;
   }
 
@@ -175,8 +181,11 @@ export class AngularSelectComponent implements ControlValueAccessor, OnChanges {
     this.onTouched = fn;
   }
 
-  setDisabledState(isDisabled: boolean) {
+  setDisabledState(this: any, isDisabled: boolean) {
     this.select.setParams({disabled: isDisabled});
   }
+
+  private onChange = () => {};
+  private onTouched = () => {};
 }
 
