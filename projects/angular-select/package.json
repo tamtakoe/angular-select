@@ -1,8 +1,11 @@
 {
   "name": "oi-angular-select",
-  "version": "0.0.12",
+  "version": "0.0.20",
   "repository": {
     "type": "git",
     "url": "https://github.com/tamtakoe/oi-angular-select"
+  },
+  "dependencies": {
+    "base-select": "^0.0.8"
   }
 }

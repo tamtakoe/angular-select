@@ -1,3 +1,4 @@
+import { isPlatformBrowser } from '@angular/common';
 import {
   Component,
   OnChanges,
@@ -6,6 +7,9 @@ import {
   forwardRef,
   ElementRef,
   ViewEncapsulation,
+  Inject,
+  PLATFORM_ID,
+  inject,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { Select } from 'base-select';
@@ -87,8 +91,11 @@ export class AngularSelectComponent implements ControlValueAccessor, OnChanges {
   @Input() models: any;
 
   select: Select | undefined;
+  isBrowser = false;
 
-  constructor(private element: ElementRef) {}
+  constructor(private element: ElementRef, @Inject(PLATFORM_ID) platformId: object) {
+    this.isBrowser = isPlatformBrowser(platformId)
+  }
 
   collectOptions(this: any) {
     const options = {
@@ -145,6 +152,9 @@ export class AngularSelectComponent implements ControlValueAccessor, OnChanges {
   }
 
   ngOnChanges(this: any) {
+    if (!this.isBrowser) {
+      return
+    }
     if (!this.select) {
       const element = this.element.nativeElement;
       const options: any = Object.assign({}, this.options, this.collectOptions());
@@ -168,7 +178,7 @@ export class AngularSelectComponent implements ControlValueAccessor, OnChanges {
     // debugger
     // console.log('this.select.setParams', value);
     // this.myForm.patchValue({counter: 0}, {emitEvent : false});
-    this.select.setParams({value});
+    this.select && this.select.setParams({value});
   }
 
   registerOnChange(fn: () => void) {
@@ -180,7 +190,7 @@ export class AngularSelectComponent implements ControlValueAccessor, OnChanges {
   }
 
   setDisabledState(this: any, isDisabled: boolean) {
-    this.select.setParams({disabled: isDisabled});
+    this.select && this.select.setParams({disabled: isDisabled});
   }
 
   private onChange = () => {};
