@@ -1,5 +1,8 @@
 # AngularSelect (WIP)
-Angular wrapper for base-select
+Angular wrapper for [base-select](https://github.com/tamtakoe/base-select/tree/master)
+
+## Demo
+https://tamtakoe.github.io/base-select
 
 ## Install
 ```sh
@@ -56,7 +59,7 @@ Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app w
 
 ## Build
 
-Run `ng build angular-select --prod` to build the project. The build artifacts will be stored in the `dist/angular-select` directory.
+Run `ng build angular-select --configuration production` to build the project. The build artifacts will be stored in the `dist/angular-select` directory.
 
 ## Publishing
 

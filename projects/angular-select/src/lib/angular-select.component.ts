@@ -5,12 +5,10 @@ import {
   Output,
   forwardRef,
   ElementRef,
-  EventEmitter,
-  ComponentFactoryResolver, // for load components
   ViewEncapsulation,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { Select } from './js-select/select';
+import { Select } from 'base-select';
 
 export const SEARCH_SELECT_VALUE_ACCESSOR: any = {
   provide: NG_VALUE_ACCESSOR,
@@ -39,7 +37,7 @@ export const SEARCH_SELECT_VALUE_ACCESSOR: any = {
   encapsulation: ViewEncapsulation.None,
   selector: 'oi-angular-select',
   template: '<ng-content></ng-content>',
-  styleUrls: ['./js-select/select.scss', './js-select/select-bootstrap.scss'],
+  styleUrl: 'angular-select.scss',
   providers: [SEARCH_SELECT_VALUE_ACCESSOR]
 })
 export class AngularSelectComponent implements ControlValueAccessor, OnChanges {
@@ -90,7 +88,7 @@ export class AngularSelectComponent implements ControlValueAccessor, OnChanges {
 
   select: Select | undefined;
 
-  constructor(private componentFactoryResolver: ComponentFactoryResolver, private element: ElementRef) {}
+  constructor(private element: ElementRef) {}
 
   collectOptions(this: any) {
     const options = {
