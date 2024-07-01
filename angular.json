@@ -163,5 +163,13 @@
   "defaultProject": "oi-angular-select",
   "cli": {
     "analytics": "1267caa6-d6c8-4261-80d2-fd30d9ba86ca"
+  },
+  "schematics": {
+    "@angular-eslint/schematics:application": {
+      "setParserOptionsProject": true
+    },
+    "@angular-eslint/schematics:library": {
+      "setParserOptionsProject": true
+    }
   }
 }
