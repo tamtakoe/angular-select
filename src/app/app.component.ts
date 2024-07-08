@@ -36,8 +36,8 @@ export class AppComponent {
 
   options2: any = {
     // multiple: true,
-    openByActiveRemove: true,
-    closeBySelect: true,
+    // openByActiveRemove: true,
+    // closeBySelect: true,
     // trackField: 'value',
     searchField: 'name',
     valueField: 'value',
