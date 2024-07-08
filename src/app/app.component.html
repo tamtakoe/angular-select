@@ -25,4 +25,12 @@ Limit <input [(ngModel)]="limit" type="number">
                      searchField="name"></oi-angular-select>
 </div>
 
+<h4>Options</h4>
+<oi-angular-select [(ngModel)]="item"
+						       [models]="items"
+						       [options]="options2"
+				></oi-angular-select>
+
+<button type="button" (click)="setOptions()">Set options</button>
+
 {{ item | json }}

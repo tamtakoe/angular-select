@@ -25,12 +25,46 @@ export class AppComponent {
   item = [];
 
   options = {
-    getItems: (query) => {
-      return new Promise((resolve) => {
+    getItems: (query: string) => {
+      return new Promise<any[]>((resolve) => {
         setTimeout(() => {
           resolve(this.items.filter(item => item.name.startsWith(query)));
         }, 1000)
       })
     }
   };
+
+  options2: any = {
+    // multiple: true,
+    openByActiveRemove: true,
+    closeBySelect: true,
+    // trackField: 'value',
+    searchField: 'name',
+    valueField: 'value',
+    // getItems: (query: string) => [1,2,3],
+    // selectedItemLabelGetter: (e: any) => {
+    //   console.log('+++', e)
+    //   // return String(e)
+    //   return'<span style="color: red">'.concat(e.name,"</span>")
+    // }
+  }
+
+  setOptions() {
+    this.options2 = {
+      multiple: true,
+      multipleLimit: 3,
+      openByActiveRemove: true,
+      closeBySelect: true,
+      trackField: 'value',
+      searchField: 'name',
+      valueField: 'value',
+      // getItems: (query: string) => [1,2,3],
+      selectedItemLabelGetter: (e: any) => {
+        console.log('+++', e)
+        // return String(e)
+        return'<span style="color: red">'.concat(e.name,"</span>")
+      }
+    }
+  }
 }
+
