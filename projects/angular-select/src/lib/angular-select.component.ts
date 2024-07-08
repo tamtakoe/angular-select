@@ -1,4 +1,3 @@
-import { isPlatformBrowser } from '@angular/common';
 import {
   Component,
   OnChanges,
@@ -10,12 +9,6 @@ import {
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { Select } from 'base-select';
-
-export const SEARCH_SELECT_VALUE_ACCESSOR: any = {
-  provide: NG_VALUE_ACCESSOR,
-  useExisting: forwardRef(() => AngularSelectComponent),
-  multi: true,
-};
 
 // function deepFind(obj: any, path: string) {
 //   if (!path) return obj;
@@ -33,7 +26,7 @@ export const SEARCH_SELECT_VALUE_ACCESSOR: any = {
 //   return current;
 // }
 
-interface SelectOptions {
+export interface SelectOptions {
   multiple?: boolean;
   multipleLimit?: number;
   removable?: boolean;
@@ -62,18 +55,18 @@ interface SelectOptions {
   titlePlaceholder?: string;
   multiplePlaceholder?: string;
   position?: string;
-  editItemFn?: (item?: any) => any;
-  createItemFn?: (item?: any) => any;
-  removeItemFn?: (item?: any) => any;
-  getItems?: (query?: string) => any[] | Promise<any[]>;
-  getItemsByValue?: (query?: string) => any[] | Promise<any[]>;
-  valueFieldGetter?: (valueField?: string) => any;
-  groupFieldGetter?: (groupField?: string) => string;
-  searchFieldGetter?: (searchField?: string) => string;
-  trackFieldGetter?: (trackField?: string) => string;
-  disabledFieldGetter?: (disabledFiel?: string) => string;
-  dropdownItemLabelGetter?: (dropdownItemLabelField?: string) => string;
-  selectedItemLabelGetter?: (selectedItemLabelField?: string) => string;
+  editItemFn?: (item: any) => any;
+  createItemFn?: (item: any) => any;
+  removeItemFn?: (item: any) => any;
+  getItems?: (query: string) => any[] | Promise<any[]>;
+  getItemsByValue?: (query: string) => any[] | Promise<any[]>;
+  valueFieldGetter?: (valueField: string) => any;
+  groupFieldGetter?: (groupField: string) => string;
+  searchFieldGetter?: (searchField: string) => string;
+  trackFieldGetter?: (trackField: string) => string;
+  disabledFieldGetter?: (disabledFiel: string) => string;
+  dropdownItemLabelGetter?: (dropdownItemLabelField: string) => string;
+  selectedItemLabelGetter?: (selectedItemLabelField: string) => string;
   customAreaGetter?: () => any;
   items?: any;
   models?: any;
@@ -86,7 +79,11 @@ interface SelectOptions {
   selector: 'oi-angular-select',
   template: '<ng-content></ng-content>',
   styleUrl: 'angular-select.scss',
-  providers: [SEARCH_SELECT_VALUE_ACCESSOR]
+  providers: [{
+    provide: NG_VALUE_ACCESSOR,
+    useExisting: forwardRef(() => AngularSelectComponent),
+    multi: true,
+  }]
 })
 export class AngularSelectComponent implements ControlValueAccessor, OnChanges {
   @Input() @Optional() options: SelectOptions = {};
@@ -118,18 +115,18 @@ export class AngularSelectComponent implements ControlValueAccessor, OnChanges {
   @Input() @Optional() titlePlaceholder = 'Select...';
   @Input() @Optional() multiplePlaceholder: string;
   @Input() @Optional() position: string;
-  @Input() @Optional() editItemFn: (item?: any) => any;
-  @Input() @Optional() createItemFn: (item?: any) => any;
-  @Input() @Optional() removeItemFn: (item?: any) => any;
-  @Input() @Optional() getItems: (query?: string) => any[] | Promise<any[]>;
-  @Input() @Optional() getItemsByValue: (query?: string) => any[] | Promise<any[]>;
-  @Input() @Optional() valueFieldGetter: (item?: string) => any;
-  @Input() @Optional() groupFieldGetter: (groupField?: string) => string;
-  @Input() @Optional() searchFieldGetter: (searchField?: string) => string;
-  @Input() @Optional() trackFieldGetter: (trackField?: string) => string;
-  @Input() @Optional() disabledFieldGetter: (disabledFiel?: string) => string;
-  @Input() @Optional() dropdownItemLabelGetter: (dropdownItemLabelField?: string) => string;
-  @Input() @Optional() selectedItemLabelGetter: (selectedItemLabelField?: string) => string;
+  @Input() @Optional() editItemFn: (item: any) => any;
+  @Input() @Optional() createItemFn: (item: any) => any;
+  @Input() @Optional() removeItemFn: (item: any) => any;
+  @Input() @Optional() getItems: (query: string) => any[] | Promise<any[]>;
+  @Input() @Optional() getItemsByValue: (query: string) => any[] | Promise<any[]>;
+  @Input() @Optional() valueFieldGetter: (item: string) => any;
+  @Input() @Optional() groupFieldGetter: (groupField: string) => string;
+  @Input() @Optional() searchFieldGetter: (searchField: string) => string;
+  @Input() @Optional() trackFieldGetter: (trackField: string) => string;
+  @Input() @Optional() disabledFieldGetter: (disabledFiel: string) => string;
+  @Input() @Optional() dropdownItemLabelGetter: (dropdownItemLabelField: string) => string;
+  @Input() @Optional() selectedItemLabelGetter: (selectedItemLabelField: string) => string;
   @Input() @Optional() customAreaGetter: () => any;
   @Input() @Optional() getTitle: (fieldName?: string) => string;
   @Input() @Optional() models: any;
@@ -154,8 +151,8 @@ export class AngularSelectComponent implements ControlValueAccessor, OnChanges {
       openByRemove: this.openByRemove,
       closeByRemove: this.closeByRemove,
       closeBySelect: this.closeBySelect,
-      openByActiveRemove: this.openByActiveRemove,
-      openByInputClick: this.openByInputClick,
+      openByActiveRemove: this.openByActiveRemove === undefined ? !this.multiple : this.openByActiveRemove,
+      openByInputClick: this.openByInputClick === undefined ? !this.multiple : this.openByInputClick,
       activeByOpen: this.activeByOpen,
       hideSelected: this.hideSelected,
       useCache: this.useCache,
@@ -214,10 +211,6 @@ export class AngularSelectComponent implements ControlValueAccessor, OnChanges {
 
   /** ControlValueAccessor interface methods. **/
   writeValue(value: any) {
-    // console.log(this.select.value);
-    // debugger
-    // console.log('this.select.setParams', value);
-    // this.myForm.patchValue({counter: 0}, {emitEvent : false});
     this.select && this.select.setParams({value});
   }
 
