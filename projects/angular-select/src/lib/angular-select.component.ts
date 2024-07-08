@@ -1,3 +1,4 @@
+import { isPlatformBrowser } from '@angular/common';
 import {
   Component,
   OnChanges,
@@ -6,6 +7,8 @@ import {
   ElementRef,
   ViewEncapsulation,
   Optional,
+  PLATFORM_ID,
+  Inject,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { Select } from 'base-select';
@@ -133,8 +136,11 @@ export class AngularSelectComponent implements ControlValueAccessor, OnChanges {
   @Input() @Optional() size: any;
 
   select: Select | undefined;
+  isBrowser = false;
 
-  constructor(private element: ElementRef) {}
+  constructor(private element: ElementRef, @Inject(PLATFORM_ID) platformId: object) {
+    this.isBrowser = isPlatformBrowser(platformId)
+  }
 
   collectOptions(this: any) {
     const options = {
@@ -191,6 +197,9 @@ export class AngularSelectComponent implements ControlValueAccessor, OnChanges {
   }
 
   ngOnChanges(this: any) {
+    if (!this.isBrowser) {
+      return
+    }
     const options: any = Object.assign({}, this.collectOptions(), this.options);
 
     if (!this.select) {
